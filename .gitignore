@@ -40,10 +40,11 @@
 /src/main/webapp/connect.lock
 /src/main/webapp/coverage
 /src/main/webapp/libpeerconnection.log
-/src/main/webappnpm-debug.log
-/src/main/webappyarn-error.log
-/src/main/webapptestem.log
+/src/main/webapp/npm-debug.log
+/src/main/webapp/yarn-error.log
+/src/main/webapp/testem.log
 /src/main/webapp/typings
+/src/main/webapp/package-lock.json
 
 # System Files
 .DS_Store
