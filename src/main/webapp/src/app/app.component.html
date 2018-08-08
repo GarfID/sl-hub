@@ -1,0 +1,10 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div class="wrapper">
+  <div *ngIf="isLoggedIn(); else loginComponent">
+    <app-container></app-container>
+  </div>
+  <ng-template #loginComponent>
+    <app-login></app-login>
+  </ng-template>
+</div>
+

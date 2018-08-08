@@ -1,0 +1,50 @@
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+.mvm
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### Angular ###
+
+# compiled output
+/src/main/webapp/dist
+/src/main/webapp/tmp
+/src/main/webapp/out-tsc
+
+# dependencies
+/src/main/webapp/node_modules
+
+# misc
+/src/main/webapp/.sass-cache
+/src/main/webapp/connect.lock
+/src/main/webapp/coverage
+/src/main/webapp/libpeerconnection.log
+/src/main/webappnpm-debug.log
+/src/main/webappyarn-error.log
+/src/main/webapptestem.log
+/src/main/webapp/typings
+
+# System Files
+.DS_Store
+Thumbs.db
