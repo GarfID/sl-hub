@@ -1,0 +1,18 @@
+:host {
+    min-height: 100%;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+/* Absolute Center Spinner */
+.loading-indicator {
+    position: fixed;
+    z-index: 999;
+    height: 100px;
+    width: 100px;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

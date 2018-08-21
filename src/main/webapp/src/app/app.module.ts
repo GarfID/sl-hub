@@ -1,43 +1,75 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MatButtonModule, MatCheckboxModule} from '@angular/material';
 
 import { AppComponent } from './app.component';
-import { ContainerComponent } from './container/container.component';
-import { LoginComponent } from './login/login.component';
+import { ContainerComponent } from './wishlist/components/container/container.component';
+import { LoginComponent } from './utils/components/login/login.component';
 
 
 import {
-  GoogleApiModule,
-  NgGapiClientConfig,
-  NG_GAPI_CONFIG,
+	GoogleApiModule,
+	NgGapiClientConfig,
+	NG_GAPI_CONFIG,
 } from "ng-gapi";
+import { HttpClientModule } from "@angular/common/http";
+import { LoaderComponent } from './utils/components/loader/loader.component';
+import { PageNotFoundComponent } from './utils/components/page-not-found/page-not-found.component';
+import { MaterialExporterModule } from "./utils/modules/material-exporter/material-exporter.module";
+import { RouterModule, Routes } from "@angular/router";
+import { AuthGuardService } from "./utils/services/auth/auth-guard.service";
+import { AuthService } from "./utils/services/auth/auth.service";
 
-let gapiClientConfig: NgGapiClientConfig = {
-  client_id: "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com",
-  discoveryDocs: [],
-  cookie_policy: 'single_host_origin',
-  hosted_domain: 'http://localhost:4200'
+const gapiClientConfig: NgGapiClientConfig = {
+	client_id: "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com",
+	discoveryDocs: ["https://analyticsreporting.googleapis.com/$discovery/rest?version=v4"],
+	scope: "email"
 };
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    ContainerComponent,
-    LoginComponent
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    GoogleApiModule.forRoot({
-      provide: NG_GAPI_CONFIG,
-      useValue: gapiClientConfig
-    }),
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+const appRoutes: Routes = [
+	{
+		path: 'login',
+		component: LoginComponent,
+		canActivate: [AuthGuardService]
+	},
+	{
+		path: 'wishlist',
+		component: ContainerComponent,
+		canActivate: [AuthGuardService]
+	},
+	{
+		path: '',
+		redirectTo: '/wishlist',
+		pathMatch: 'full'
+	},
+	{
+		path: '**',
+		redirectTo: ''
+	}
+];
+
+@NgModule( {
+	declarations: [
+		AppComponent,
+		ContainerComponent,
+		LoginComponent,
+		LoaderComponent,
+		PageNotFoundComponent,
+	],
+	imports: [
+		BrowserModule,
+		HttpClientModule,
+		MaterialExporterModule,
+		GoogleApiModule.forRoot( {
+			provide: NG_GAPI_CONFIG,
+			useValue: gapiClientConfig
+		} ),
+		RouterModule.forRoot(
+			appRoutes
+		)
+	],
+	providers: [AuthService, AuthGuardService],
+	entryComponents: [AppComponent],
+	bootstrap: [AppComponent]
+} )
+export class AppModule {
+}
