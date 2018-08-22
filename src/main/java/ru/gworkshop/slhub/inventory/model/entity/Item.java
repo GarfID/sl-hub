@@ -1,15 +1,16 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.inventory.model.entity;
 
 import lombok.Builder;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.validator.constraints.URL;
+
 import javax.validation.constraints.NotNull;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "hub_item")
+@Table(name = "inv_item")
 @Builder
 @ToString
 @Log4j2
@@ -31,7 +32,7 @@ public class Item {
     private String img;
 
     @NotNull
-    private int price;
+    private Integer price;
 
     @NotNull
     @Enumerated(EnumType.STRING)

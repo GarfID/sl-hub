@@ -2,12 +2,12 @@ package ru.gworkshop.slhub.wishlist.model.entity;
 
 import lombok.Builder;
 import lombok.Data;
-import javax.validation.constraints.NotNull;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import ru.gworkshop.slhub.model.entity.Crate;
+import ru.gworkshop.slhub.common.model.entity.Crate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 

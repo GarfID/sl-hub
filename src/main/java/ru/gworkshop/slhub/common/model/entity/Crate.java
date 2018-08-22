@@ -1,4 +1,4 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.common.model.entity;
 
 import lombok.Builder;
 import lombok.ToString;

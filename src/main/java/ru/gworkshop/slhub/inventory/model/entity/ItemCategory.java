@@ -1,15 +1,15 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.inventory.model.entity;
 
 import lombok.Builder;
-import javax.validation.constraints.NotNull;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "hub_item_category")
+@Table(name = "inv_item_category")
 @Builder
 @ToString
 @Log4j2

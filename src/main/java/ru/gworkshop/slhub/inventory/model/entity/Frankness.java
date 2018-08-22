@@ -1,4 +1,4 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.inventory.model.entity;
 
 public enum Frankness {
     GENERAL,

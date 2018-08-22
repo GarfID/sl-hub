@@ -13,11 +13,12 @@ import {
 } from "ng-gapi";
 import { HttpClientModule } from "@angular/common/http";
 import { LoaderComponent } from './utils/components/loader/loader.component';
-import { PageNotFoundComponent } from './utils/components/page-not-found/page-not-found.component';
 import { MaterialExporterModule } from "./utils/modules/material-exporter/material-exporter.module";
 import { RouterModule, Routes } from "@angular/router";
 import { AuthGuardService } from "./utils/services/auth/auth-guard.service";
 import { AuthService } from "./utils/services/auth/auth.service";
+import { User } from "./utils/model/user";
+import { HttpProviderService } from "./utils/services/http/http-provider-service.service";
 
 const gapiClientConfig: NgGapiClientConfig = {
 	client_id: "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com",
@@ -53,7 +54,6 @@ const appRoutes: Routes = [
 		ContainerComponent,
 		LoginComponent,
 		LoaderComponent,
-		PageNotFoundComponent,
 	],
 	imports: [
 		BrowserModule,
@@ -64,10 +64,12 @@ const appRoutes: Routes = [
 			useValue: gapiClientConfig
 		} ),
 		RouterModule.forRoot(
-			appRoutes
+			appRoutes, {
+				relativeLinkResolution: "corrected"
+			}
 		)
 	],
-	providers: [AuthService, AuthGuardService],
+	providers: [AuthService, AuthGuardService, User, HttpProviderService],
 	entryComponents: [AppComponent],
 	bootstrap: [AppComponent]
 } )

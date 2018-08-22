@@ -1,4 +1,4 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.inventory.model.entity;
 
 import lombok.Builder;
 import lombok.ToString;
@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.URL;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "hub_item_shop")
+@Table(name = "inv_item_shop")
 @Builder
 @ToString
 @Log4j2

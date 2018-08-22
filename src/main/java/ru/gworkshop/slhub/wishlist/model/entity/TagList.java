@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "wl_tag_list")
 @Builder
 @Data
 @ToString

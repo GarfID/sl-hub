@@ -15,7 +15,6 @@ export class AuthGuardService implements CanActivate {
 	}
 
 	canActivate( route: ActivatedRouteSnapshot, state: RouterStateSnapshot ): Observable<boolean> {
-		console.log('Я еду в ' + state.url);
 		return this.checkLogin( state.url );
 	}
 
@@ -25,15 +24,12 @@ export class AuthGuardService implements CanActivate {
 
 				if ( res ) {
 					if ( url == '/login' ) {
-						console.log('Че я тут делаю?');
 						this.authService.getRouter().navigate( ['/wishlist'] );
 						observer.next( false );
 					} else {
-						console.log('Ну, я пошел');
 						observer.next( true );
 					}
 				} else {
-					console.log('Я не авторизован');
 					if(url == '/login') {
 						observer.next(true);
 					} else {

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { AuthService } from "../../../utils/services/auth/auth.service";
+import { Router } from "@angular/router";
 
 @Component( {
 	selector: 'app-container',
@@ -10,9 +11,10 @@ export class ContainerComponent {
 
 	@Output() loggedOut = new EventEmitter<boolean>();
 
-	constructor( private authService: AuthService ) {}
+	constructor( private authService: AuthService,
+	             private router: Router) {}
 
 	signOut() {
-		this.authService.signOut().subscribe();
+		this.authService.signOut().subscribe(() => this.router.navigate(['/login']));
 	}
 }

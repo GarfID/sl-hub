@@ -1,4 +1,4 @@
-package ru.gworkshop.slhub.model.entity;
+package ru.gworkshop.slhub.common.model.entity;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "hub_crate_user")
 @Builder
 @Data
 @ToString

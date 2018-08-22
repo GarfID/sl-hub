@@ -1,8 +1,8 @@
-package ru.gworkshop.slhub.model.repository;
+package ru.gworkshop.slhub.inventory.model.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.gworkshop.slhub.model.entity.ItemCategory;
+import ru.gworkshop.slhub.inventory.model.entity.ItemCategory;
 
 @Repository
 public interface ItemCategoryRepository extends CrudRepository<ItemCategory, Long> {
