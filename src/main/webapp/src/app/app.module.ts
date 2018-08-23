@@ -18,7 +18,6 @@ import { RouterModule, Routes } from "@angular/router";
 import { AuthGuardService } from "./utils/services/auth/auth-guard.service";
 import { AuthService } from "./utils/services/auth/auth.service";
 import { User } from "./utils/model/user";
-import { HttpProviderService } from "./utils/services/http/http-provider-service.service";
 
 const gapiClientConfig: NgGapiClientConfig = {
 	client_id: "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com",
@@ -69,7 +68,7 @@ const appRoutes: Routes = [
 			}
 		)
 	],
-	providers: [AuthService, AuthGuardService, User, HttpProviderService],
+	providers: [AuthService, AuthGuardService, User],
 	entryComponents: [AppComponent],
 	bootstrap: [AppComponent]
 } )

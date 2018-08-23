@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { ApplicationRef, ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
 import { AuthService } from "../../../utils/services/auth/auth.service";
 import { User } from "../../../utils/model/user";
 import { Router } from "@angular/router";
+import { Observable } from "rxjs";
 
 @Component( {
 	selector: 'app-container',
@@ -10,14 +11,20 @@ import { Router } from "@angular/router";
 } )
 export class ContainerComponent{
 
-	@Output() loggedOut = new EventEmitter<boolean>();
+	id: Observable<number>;
+	email: Observable<String>;
+	googleId: Observable<String>;
+	state: Observable<String>;
 
-	constructor( private authService: AuthService, public user: User, private router: Router) {
+
+	constructor( private authService: AuthService, public user: User, private router: Router, private changeDec: ChangeDetectorRef) {
+		this.id = this.user.getId();
+		this.email = this.user.getEmail();
+		this.googleId = this.user.getGoogleId();
+		this.state = this.user.getState();
 	}
 
-	get id(): number {
-		return this.user.id;
-	}
+
 
 	debug() {
 		console.log(this.user);

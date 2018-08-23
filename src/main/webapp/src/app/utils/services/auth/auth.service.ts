@@ -73,7 +73,7 @@ export class AuthService {
 					.getAuthResponse().id_token ).subscribe( data => {
 					switch (data['status']) {
 						case 45:
-							if ( this.user.id == null ) {
+							if ( this.user.id.getValue() == null ) {
 								observer.next( false )
 							} else {
 								this.signIn().subscribe( () => {
@@ -89,7 +89,7 @@ export class AuthService {
 							observer.next( false );
 							break;
 						case 25:
-							if ( this.user.state == null || this.user.state != data['state'] ) {
+							if ( this.user.state.getValue() == null || this.user.state.getValue() != data['state'] ) {
 								this.getServerResponce( '/user/sync', auth.currentUser.get()
 									.getAuthResponse().id_token ).subscribe( data => {
 										this.user.setUser(data['user']).subscribe(() => {

@@ -1,7 +1,7 @@
 <div>
-    <span>ID: {{this.user.id}}</span><br>
-    <span>Email: {{this.user.email}}</span><br>
-    <span>State:{{this.user.state}}</span><br>
+    <span>ID: {{this.id|async}}</span><br>
+    <span>Email: {{this.email|async}}</span><br>
+    <span>State:{{this.state|async}}</span><br>
 </div>
 <button mat-raised-button (click)="signOut()">Выйти</button>
 <button mat-raised-button (click)="debug()">Отладка</button>
