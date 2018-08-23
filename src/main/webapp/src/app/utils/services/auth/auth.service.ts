@@ -4,14 +4,14 @@ import { GoogleApiService } from "ng-gapi";
 import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { User } from "../../model/user";
+import { UserProviderService } from "../data/user-provider.service";
 
 @Injectable()
 export class AuthService {
 
 	constructor( private googleAuthService: GoogleAuthService,
 	             private gapiService: GoogleApiService,
-	             public user: User,
+	             private userProvider: UserProviderService,
 	             private router: Router,
 	             private http: HttpClient
 	) {
@@ -34,10 +34,8 @@ export class AuthService {
 						switch (data['status']) {
 							case 21:
 							case 25:
-								console.log('Успешно получил пользователя');
-								this.user.setUser( data['user'] ).subscribe( res => {
-									observer.next( res );
-								} );
+								this.userProvider.setUser( data['user']);
+								observer.next( true );
 								break;
 							case 45:
 								observer.next( false );
@@ -55,15 +53,18 @@ export class AuthService {
 			this.googleAuthService.getAuth().subscribe( auth => {
 				try {
 					auth.signOut();
-					this.user.flush().subscribe(res => setTimeout(() => {
-						observer.next(res);
-					}, 150));
+
+					setTimeout( () => {
+						this.userProvider.flush().subscribe(() => {
+							observer.next( true );
+						});
+					}, 50 );
 
 				} catch (e) {
 					observer.next( false );
 				}
-			});
-		});
+			} );
+		} );
 	}
 
 	public isLoggedIn(): Observable<boolean> {
@@ -73,7 +74,7 @@ export class AuthService {
 					.getAuthResponse().id_token ).subscribe( data => {
 					switch (data['status']) {
 						case 45:
-							if ( this.user.id.getValue() == null ) {
+							if ( this.userProvider.getUser().state == null ) {
 								observer.next( false )
 							} else {
 								this.signIn().subscribe( () => {
@@ -84,17 +85,18 @@ export class AuthService {
 									}
 								);
 							}
+							observer.next( false );
 							break;
 						case 44:
 							observer.next( false );
 							break;
 						case 25:
-							if ( this.user.state.getValue() == null || this.user.state.getValue() != data['state'] ) {
+							if ( this.userProvider.getUser().state == null || this.userProvider.getUser().state != data['state'] ) {
 								this.getServerResponce( '/user/sync', auth.currentUser.get()
 									.getAuthResponse().id_token ).subscribe( data => {
-										this.user.setUser(data['user']).subscribe(() => {
-											observer.next( true );
-										})
+									this.userProvider.setUser( data['user'] ).subscribe( () => {
+										observer.next( true );
+									} )
 								} );
 							} else {
 								observer.next( true );

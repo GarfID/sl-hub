@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { AuthService } from "../../services/auth/auth.service";
 import { Router } from "@angular/router";
 
@@ -12,14 +12,16 @@ export class LoginComponent {
 
 	constructor(
 		private authService: AuthService,
-		private router: Router
+		private router: Router,
+		private ngZone: NgZone
 	) {
 	}
 
 	public signIn() {
 		this.authService.signIn().subscribe( () => {
-			console.log('Авторизован!');
-			this.router.navigate( ['wishlist'] )
+			this.ngZone.run(() => {
+				this.router.navigate( ['wishlist'] );
+			});
 		} );
 	}
 }
