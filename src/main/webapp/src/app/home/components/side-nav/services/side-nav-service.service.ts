@@ -1,24 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { MatSidenav } from '@angular/material';
 
 @Injectable()
 export class SidenavService {
-	private sidenav: MatSidenav;
 
-	public setSidenav(sidenav: MatSidenav ) {
-		this.sidenav = sidenav;
+	private sideNav: MatSidenav;
+
+	constructor(private ngZone: NgZone ){
+
 	}
 
-	public open() {
-		return this.sidenav.open();
+	public setSidenav(sideNav: MatSidenav) {
+		this.sideNav = sideNav;
 	}
 
-
-	public close() {
-		return this.sidenav.close();
-	}
-
-	public toggle(): void {
-		this.sidenav.toggle();
+	public toggle(){
+		this.ngZone.run(() => {
+			this.sideNav.toggle();
+		});
 	}
 }

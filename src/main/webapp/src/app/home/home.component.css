@@ -1,4 +1,4 @@
-.home-container{
+.home-container {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -6,4 +6,26 @@
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+mat-sidenav-container {
+    height: 100%;
+}
+
+.component {
+    display: inline-block;
+    background: black;
+    height: calc(141px * 2 + 16px);
+    width: calc(141px * 2 + 16px);
+    margin: calc(16px / 2);
+}
+
+
+.content-container {
+    margin: 18px;
+}
+
+.mat-sidenav {
+    min-width: 400px;
+    max-width: 400px;
 }

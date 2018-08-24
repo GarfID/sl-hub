@@ -1,4 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+	Component,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import { MatSidenav } from "@angular/material";
 import { SidenavService } from "./components/side-nav/services/side-nav-service.service";
 
@@ -9,9 +13,10 @@ import { SidenavService } from "./components/side-nav/services/side-nav-service.
 } )
 export class HomeComponent implements OnInit {
 
-	@ViewChild('sideNav') public sidenav: MatSidenav;
+	@ViewChild('sidenav') private sidenav: MatSidenav;
+	public scrollbarOptions = { axis: 'x', theme: 'minimal-dark' };
 
-	constructor(private sideNavService:SidenavService) {
+	constructor(private sideNavService: SidenavService) {
 	}
 
 	ngOnInit(): void {
