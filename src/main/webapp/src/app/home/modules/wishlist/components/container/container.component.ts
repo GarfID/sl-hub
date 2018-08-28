@@ -23,9 +23,5 @@ export class ContainerComponent implements OnInit {
 		this.userProvider.user.subscribe( user => this.user = user );
 	}
 
-	signOut() {
-		this.authService.signOut().subscribe( () => {
-			this.router.navigate( ['login'] );
-		} );
-	}
+
 }

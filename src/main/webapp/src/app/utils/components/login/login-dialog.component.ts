@@ -5,10 +5,10 @@ import { Router } from "@angular/router";
 
 @Component( {
 	selector: 'app-login',
-	templateUrl: './login.component.html',
-	styleUrls: ['./login.component.css']
+	templateUrl: './login-dialog.component.html',
+	styleUrls: ['./login-dialog.component.css']
 } )
-export class LoginComponent {
+export class LoginDialog {
 
 	constructor(
 		private authService: AuthService,
@@ -18,10 +18,14 @@ export class LoginComponent {
 	}
 
 	public signIn() {
-		this.authService.signIn().subscribe( () => {
-			this.ngZone.run(() => {
-				this.router.navigate( ['wishlist'] );
-			});
+		this.authService.signIn().subscribe( (res) => {
+			if(res) {
+				this.authService.signIn().subscribe(() => {
+					this.ngZone.run(() => {
+						this.authService.getRouter().navigate(['home']);
+					});
+				});
+			}
 		} );
 	}
 }

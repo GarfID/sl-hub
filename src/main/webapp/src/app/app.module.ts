@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { LoginComponent } from './utils/components/login/login.component';
+import { LoginDialog } from './utils/components/login/login-dialog.component';
 
 import {
 	GoogleApiModule,
@@ -20,7 +20,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppRouting } from "./app.routing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SidenavService } from "./home/components/side-nav/services/side-nav-service.service";
-import { MatNativeDateModule } from "@angular/material";
+
 
 const gapiClientConfig: NgGapiClientConfig = {
 	client_id: "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com",
@@ -31,7 +31,7 @@ const gapiClientConfig: NgGapiClientConfig = {
 @NgModule( {
 	declarations: [
 		AppComponent,
-		LoginComponent,
+		LoginDialog,
 		LoaderComponent,
 	],
 	imports: [
@@ -40,7 +40,6 @@ const gapiClientConfig: NgGapiClientConfig = {
 		FormsModule,
 		HttpClientModule,
 		MaterialExporterModule,
-		MatNativeDateModule,
 		FormsModule,
 		ReactiveFormsModule,
 		GoogleApiModule.forRoot( {
@@ -54,9 +53,9 @@ const gapiClientConfig: NgGapiClientConfig = {
 		AuthGuardService,
 		UserProviderService,
 		User,
-		SidenavService,
-		],
-	entryComponents: [AppComponent],
+		SidenavService
+	],
+	entryComponents: [AppComponent, LoginDialog],
 	bootstrap: [AppComponent]
 } )
 export class AppModule {

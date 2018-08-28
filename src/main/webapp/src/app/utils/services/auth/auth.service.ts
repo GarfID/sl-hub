@@ -25,7 +25,6 @@ export class AuthService {
 		return this.router
 	}
 
-	//TODO: перенести редиректы в отдельный Router
 	signIn(): Observable<boolean> {
 		return new Observable( observer => {
 			this.googleAuthService.getAuth().subscribe( ( auth ) => {
@@ -34,8 +33,11 @@ export class AuthService {
 						switch (data['status']) {
 							case 21:
 							case 25:
-								this.userProvider.setUser( data['user']);
-								observer.next( true );
+								this.getUserPicture().subscribe(url => {
+									data['user']['picture'] = url;
+									this.userProvider.setUser( data['user']);
+									observer.next( true );
+								});
 								break;
 							case 45:
 								observer.next( false );
@@ -47,7 +49,6 @@ export class AuthService {
 		} );
 	}
 
-	//TODO: перенести редиректы в отдельный Router
 	public signOut(): Observable<boolean> {
 		return new Observable( observer => {
 			this.googleAuthService.getAuth().subscribe( auth => {
@@ -94,9 +95,12 @@ export class AuthService {
 							if ( this.userProvider.getUser().state == null || this.userProvider.getUser().state != data['state'] ) {
 								this.getServerResponce( '/user/sync', auth.currentUser.get()
 									.getAuthResponse().id_token ).subscribe( data => {
-									this.userProvider.setUser( data['user'] ).subscribe( () => {
-										observer.next( true );
-									} )
+									this.getUserPicture().subscribe(url => {
+										data['user']['picture'] = url;
+										this.userProvider.setUser( data['user']).subscribe(() => {
+											observer.next( true );
+										});
+									});
 								} );
 							} else {
 								observer.next( true );
@@ -106,6 +110,14 @@ export class AuthService {
 				} );
 			} );
 		} );
+	}
+
+	public getUserPicture(): Observable<String>{
+		return new Observable(observer => {
+			this.googleAuthService.getAuth().subscribe(auth => {
+				observer.next(auth.currentUser.get().getBasicProfile()['Paa']);
+			})
+		});
 	}
 
 	public getServerResponce( url: String, token: string ) {

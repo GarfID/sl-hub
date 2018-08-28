@@ -8,7 +8,7 @@ import { SidenavService } from "../side-nav/services/side-nav-service.service";
 } )
 export class ToolBarComponent{
 
-	constructor( private sideNavService: SidenavService ) {
+	constructor( private sideNavService: SidenavService) {
 	}
 
 	toggleRightSidenav() {

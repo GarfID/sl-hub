@@ -1,12 +1,12 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from "./utils/components/login/login.component";
+import { LoginDialog } from "./utils/components/login/login-dialog.component";
 import { AuthGuardService } from "./utils/services/auth/auth-guard.service";
 
 const appRoutes: Routes = [
 	{
 		path: 'login',
-		component: LoginComponent,
+		component: LoginDialog,
 		canActivate: [AuthGuardService]
 	},
 	{
@@ -18,11 +18,9 @@ const appRoutes: Routes = [
 		path: '',
 		redirectTo: '/home',
 		pathMatch: 'full'
-	},
-	{
-		path: '**',
-		redirectTo: ''
 	}
 ];
 
-export const AppRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes);
+export const AppRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, {
+	//enableTracing: true
+});

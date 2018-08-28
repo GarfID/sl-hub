@@ -7,6 +7,7 @@ export class User {
 	public id: number;
 	public email: String;
 	public googleId: String;
+	public userImage: String;
 	public state: String;
 
 	constructor() {
@@ -18,6 +19,7 @@ export class User {
 			this.email = data['email'];
 			this.googleId = data['googleId'];
 			this.state = data['state'];
+			this.userImage = data['picture'];
 			observer.next( true );
 		} );
 	}
