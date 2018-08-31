@@ -1,5 +1,7 @@
 package ru.gworkshop.slhub.common.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gworkshop.slhub.common.model.entity.Crate;
@@ -14,6 +16,7 @@ import java.util.Optional;
 @Service
 public class CrateHandler
 {
+    private Logger logger = LoggerFactory.getLogger( CrateHandler.class );
     private CrateRepository crateRepository;
     private WishListHandler wishListHandler;
 
@@ -71,8 +74,7 @@ public class CrateHandler
                     return false;
                 }
             } catch (RuntimeException e) {
-                //TODO: Add proper logger
-                System.out.println( e.getMessage() );
+                logger.debug( e.getMessage() );
                 return false;
             }
         } else {
@@ -103,8 +105,7 @@ public class CrateHandler
                     return false;
                 }
             } catch (RuntimeException e) {
-                //TODO: Add proper logger
-                System.out.println( e.getMessage() );
+                logger.debug( e.getMessage() );
                 return false;
             }
         } else {
@@ -135,8 +136,7 @@ public class CrateHandler
                     return false;
                 }
             } catch (RuntimeException e) {
-                //TODO: Add proper logger
-                System.out.println( e.getMessage() );
+                logger.debug( e.getMessage() );
                 return false;
             }
         } else {
@@ -166,8 +166,7 @@ public class CrateHandler
                     return false;
                 }
             } catch (RuntimeException e) {
-                //TODO: Add proper logger
-                System.out.println( e.getMessage() );
+                logger.debug( e.getMessage() );
                 return false;
             }
         } else {
