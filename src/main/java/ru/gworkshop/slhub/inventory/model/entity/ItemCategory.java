@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Entity
 @Table(name = "inv_item_category")
@@ -22,7 +23,13 @@ public class ItemCategory {
     @Size(max = 64)
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "parent")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private ItemCategory parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ItemCategory> childCategories;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Item> categoryItems;
 }

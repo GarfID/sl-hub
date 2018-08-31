@@ -1,4 +1,4 @@
-package ru.gworkshop.slhub.common.service;
+package ru.gworkshop.slhub.common.model.rest.responce;
 
 public class AuthResponce
 {

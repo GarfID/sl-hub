@@ -3,7 +3,6 @@ package ru.gworkshop.slhub.wishlist.model.entity;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import ru.gworkshop.slhub.common.model.entity.Crate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,9 +18,9 @@ public class Priority {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "crate_id")
-    private Crate crate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "list_id")
+    private WishList wishList;
 
     @NotNull
     @Size(max = 16)

@@ -18,11 +18,11 @@ public class TagList {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "list_id")
-    private List list;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "list_item_id")
+    private WishListItem wishList;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 }

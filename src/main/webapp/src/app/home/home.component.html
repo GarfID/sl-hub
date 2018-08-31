@@ -1,46 +1,30 @@
-<div class="home-container">
-    <mat-toolbar color="primary">
-        <app-tool-bar></app-tool-bar>
-    </mat-toolbar>
-    <mat-sidenav-container>
-        <mat-sidenav #sidenav [mode]="over">
-            Бла-бла-бла
-        </mat-sidenav>
-        <mat-sidenav-content>
-            <perfect-scrollbar>
-                <div class="content-container">
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                    <div class="component"></div>
-                </div>
-            </perfect-scrollbar>
-        </mat-sidenav-content>
-    </mat-sidenav-container>
-</div>
+<nav mat-tab-nav-bar [backgroundColor]="background">
+    <button class="sidenav-toggle" mat-icon-button (click)="toggleSidenav()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <a mat-tab-link
+       *ngFor="let link of navLinks"
+       [active]="activeLink == link"
+        (click)="navTo(link)">
+        {{link.label}}</a>
+    <div class="user-ear">
+        <div>
+            <button class="ear-content" mat-button (click)="this.openMenu()">
+                {{user.email}}
+                <img class="user-icon" [src]="user.userImage">
+                <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu"></div>
+            </button>
+        </div>
+        <mat-menu #menu="matMenu" yPosition="below">
+            <button mat-menu-item (click)="this.signOut()" >Выход</button>
+        </mat-menu>
+    </div>
+</nav>
+<mat-sidenav-container>
+    <mat-sidenav #sidenav [mode]="over">
+        Бла-бла-бла
+    </mat-sidenav>
+    <mat-sidenav-content style="padding: 12px">
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

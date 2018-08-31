@@ -1,0 +1,28 @@
+mat-sidenav-container {
+    height: 100%;
+}
+
+.sidenav-toggle {
+    margin: 4px 4px 0 20px;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.user-ear {
+    position: fixed;
+    right: 16px;
+}
+
+.user-icon {
+    margin: 4px;
+    height: 40px;
+    border-radius: 50%;
+}

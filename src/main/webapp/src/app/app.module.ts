@@ -19,7 +19,7 @@ import { UserProviderService } from "./utils/services/data/user-provider.service
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppRouting } from "./app.routing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { SidenavService } from "./home/components/side-nav/services/side-nav-service.service";
+import { SidenavService } from "./home/services/side-nav-service.service";
 
 
 const gapiClientConfig: NgGapiClientConfig = {

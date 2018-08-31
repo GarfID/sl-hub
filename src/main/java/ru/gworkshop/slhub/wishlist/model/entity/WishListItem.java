@@ -3,7 +3,6 @@ package ru.gworkshop.slhub.wishlist.model.entity;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import ru.gworkshop.slhub.common.model.entity.Crate;
 import ru.gworkshop.slhub.inventory.model.entity.Item;
 
 import javax.persistence.*;
@@ -11,24 +10,25 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@Table(name = "wl_list")
+@Table(name = "wl_list_items")
 @Builder
 @ToString
 @Log4j2
-public class List {
+public class WishListItem
+{
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "crate_id")
-    private Crate crate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "list_id")
+    private WishList wishList;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "priority_id")
     private Priority priority;
 
@@ -36,6 +36,6 @@ public class List {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy = "list")
+    @OneToMany(mappedBy = "wishList")
     private Set<TagList> tagLists;
 }

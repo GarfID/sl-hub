@@ -38,11 +38,11 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private Frankness frankness;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     private ItemShop shop;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private ItemCategory category;
 }

@@ -1,13 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ContainerComponent } from "./components/container/container.component";
+import { WishListComponent } from "./wishlist.component";
+import { WishListRouterModule } from "./wishlist-router.module";
+import { MaterialExporterModule } from "../../../utils/modules/material-exporter/material-exporter.module";
 
 @NgModule( {
 	imports: [
-		CommonModule
+		CommonModule,
+        WishListRouterModule,
+        MaterialExporterModule
 	],
 	declarations: [
-		ContainerComponent
+        WishListComponent
 	]
 } )
 export class WishListModule {

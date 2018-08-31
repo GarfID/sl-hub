@@ -1,7 +1,0 @@
-<div>
-    <button class="ear-content" mat-button (click)="this.openMenu()">{{user.email}}<img class="user-icon" [src]="user.userImage"><div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu"></div></button>
-</div>
-<mat-menu #menu="matMenu" yPosition="below">
-    <button mat-menu-item>Личный кабинет</button>
-    <button mat-menu-item (click)="this.signOut()" >Выход</button>
-</mat-menu>

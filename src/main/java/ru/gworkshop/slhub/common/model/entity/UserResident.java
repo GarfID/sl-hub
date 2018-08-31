@@ -2,6 +2,7 @@ package ru.gworkshop.slhub.common.model.entity;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
@@ -14,14 +15,16 @@ import javax.validation.constraints.Size;
 @Builder
 @Data
 @ToString
+@EqualsAndHashCode
 @Log4j2
 public class UserResident
 {
 	@Id
 	@GeneratedValue
+	@EqualsAndHashCode.Exclude
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
 
@@ -30,5 +33,6 @@ public class UserResident
 	private String login;
 
 	@NotNull
+	@EqualsAndHashCode.Exclude
 	private String password;
 }

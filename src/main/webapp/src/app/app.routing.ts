@@ -22,5 +22,5 @@ const appRoutes: Routes = [
 ];
 
 export const AppRouting: ModuleWithProviders = RouterModule.forRoot(appRoutes, {
-	//enableTracing: true
+	enableTracing: true
 });

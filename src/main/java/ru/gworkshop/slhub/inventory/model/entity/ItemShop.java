@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "inv_item_shop")
@@ -23,4 +24,7 @@ public class ItemShop {
     @URL
     @Column(unique = true)
     private String url;
+
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Item> shopItems;
 }
