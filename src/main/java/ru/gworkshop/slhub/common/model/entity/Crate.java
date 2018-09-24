@@ -1,9 +1,6 @@
 package ru.gworkshop.slhub.common.model.entity;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import ru.gworkshop.slhub.wishlist.model.entity.WishList;
 
@@ -15,6 +12,9 @@ import java.util.Set;
 @Entity
 @Table(name = "hub_crate")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @ToString
 @EqualsAndHashCode
 @Log4j2

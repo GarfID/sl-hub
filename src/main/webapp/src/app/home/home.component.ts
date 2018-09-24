@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { UserProviderService } from "../utils/services/data/user-provider.service";
 import { User } from "../utils/model/user";
 import { AuthService } from "../utils/services/auth/auth.service";
+import { FormControl } from "@angular/forms";
 
 @Component( {
 	selector: 'app-home',
@@ -19,6 +20,8 @@ export class HomeComponent implements OnInit {
 
     @ViewChild( 'sidenav') sideNav: MatSidenav;
     @ViewChild( 'menuTrigger' ) userEarMenu: MatMenuTrigger;
+
+    mode = new FormControl('over');
 
 	public scrollbarOptions = { axis: 'x', theme: 'minimal-dark' };
 	public navLinks: Array<Object> = [];

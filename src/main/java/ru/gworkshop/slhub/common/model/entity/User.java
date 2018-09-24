@@ -16,6 +16,8 @@ import java.util.Set;
 @Entity
 @Table(name = "hub_user")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString
 @Log4j2

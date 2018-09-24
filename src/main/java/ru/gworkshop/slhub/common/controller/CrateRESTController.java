@@ -8,7 +8,7 @@ import ru.gworkshop.slhub.common.service.UserHandler;
 import ru.gworkshop.slhub.wishlist.service.WishListHandler;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200", "https://sl-hub.g-workshop.ru"})
 @RequestMapping("/crate")
 public class CrateRESTController
 {

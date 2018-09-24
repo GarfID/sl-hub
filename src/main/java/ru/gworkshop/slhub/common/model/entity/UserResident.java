@@ -1,9 +1,6 @@
 package ru.gworkshop.slhub.common.model.entity;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
@@ -13,6 +10,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "hub_user_resident")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString
 @EqualsAndHashCode

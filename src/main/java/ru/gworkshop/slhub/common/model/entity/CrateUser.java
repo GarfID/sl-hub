@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "hub_crate_user")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString
 @EqualsAndHashCode

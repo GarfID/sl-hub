@@ -7,6 +7,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.hibernate.ObjectNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.gworkshop.slhub.common.model.rest.responce.AuthResponce;
@@ -30,13 +32,15 @@ public class Auth
      * 500 - непредвиденная ошибка
      */
 
+    private static Logger logger = LoggerFactory.getLogger( Auth.class );
     private final UserHandler userHandler;
 
     @Autowired
     public Auth( UserHandler userHandler ){this.userHandler = userHandler;}
 
-    public static GoogleIdToken getIdToken( String token )
+    static GoogleIdToken getIdToken( String token )
     {
+        logger.debug( "Entering getIdToken with arg " + token);
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new JacksonFactory();
         String CLIENT_ID = "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com";
@@ -44,25 +48,40 @@ public class Auth
                 Collections.singletonList( CLIENT_ID ) )
                                                                                                     .build();
         try {
-            return verifier.verify( token );
-        } catch (GeneralSecurityException | IOException e) {
+            GoogleIdToken idToken = verifier.verify( token );
+            if ( idToken == null ) {
+                logger.debug( "Token is not verified" );
+                throw new NullPointerException( "Veryfier returned NULL" );
+            } else {
+                logger.debug( "idToken is " + token );
+                return idToken;
+            }
+        } catch (NullPointerException | IllegalArgumentException | GeneralSecurityException | IOException e) {
+            logger.debug( "Token invalid while validating" );
             throw new IllegalArgumentException( "Invalid token" );
         }
     }
 
     private boolean checkToken( String token )
     {
-        try {
-            getIdToken( token );
-        } catch (IllegalArgumentException e) {
+        logger.debug( "Entered checkToken with arg " + token );
+        if ( token == null || token.length() < 64 ) {
+            logger.debug( "Token is too short" );
             return false;
-        } finally {
-            return true;
+        } else {
+            try {
+                getIdToken( token );
+            } catch (IllegalArgumentException e) {
+                return false;
+            } finally {
+                return true;
+            }
         }
     }
 
     public AuthResponce checkAuth( String token )
     {
+        logger.debug( "Entered checkAuth with arg " + token );
         if ( checkToken( token ) ) {
             try {
                 String shortUser = userHandler.getUserState( token );
@@ -71,6 +90,7 @@ public class Auth
                 return new AuthResponce( 44, null );
             }
         } else {
+            logger.debug( "Recived token is invalid" );
             return new AuthResponce( 45, null );
         }
     }
