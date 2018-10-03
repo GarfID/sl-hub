@@ -1,5 +1,6 @@
 package ru.gworkshop.slhub.common.service;
 
+import org.hibernate.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,23 +9,21 @@ import ru.gworkshop.slhub.common.model.entity.Crate;
 import ru.gworkshop.slhub.common.model.entity.CrateUser;
 import ru.gworkshop.slhub.common.model.entity.User;
 import ru.gworkshop.slhub.common.model.repository.CrateRepository;
-import ru.gworkshop.slhub.wishlist.model.entity.WishList;
-import ru.gworkshop.slhub.wishlist.service.WishListHandler;
 
+import java.security.AccessControlException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CrateHandler
 {
     private Logger logger = LoggerFactory.getLogger( CrateHandler.class );
-    private CrateRepository crateRepository;
-    private WishListHandler wishListHandler;
+    private final CrateRepository crateRepository;
 
     @Autowired
-    public CrateHandler( CrateRepository crateRepository, WishListHandler wishListHandler )
+    public CrateHandler( CrateRepository crateRepository )
     {
         this.crateRepository = crateRepository;
-        this.wishListHandler = wishListHandler;
     }
 
     public Crate get( Long id )
@@ -35,158 +34,109 @@ public class CrateHandler
         }
     }
 
-    public boolean createCrate( User ownerUser, String label )
+    public List<Crate> getByUser( User user )
     {
-        for ( Crate userCrate : ownerUser.getUserCrates() ) {
-            if ( userCrate.getLabel()
-                          .equals( label ) ) {
-                return false;
-            }
-        }
+        return crateRepository.findByUser( user );
+    }
 
+    public Boolean create( User user, String label )
+    {
         Crate crate = Crate.builder()
                            .label( label )
                            .build();
-        CrateUser crateUser = CrateUser.builder()
-                                       .user( ownerUser )
-                                       .crate( crate )
-                                       .isOwner( true )
-                                       .build();
-        if ( crate.addCrateUser( crateUser ) ) {
-            crateRepository.save( crate );
+        if(crate.addUser( user, new Boolean[] {true, true, true} )) {
+            this.crateRepository.save( crate );
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean deleteCrate( User ownerUser, Long crateId )
+    public Boolean delete( User user, Long crateId ) throws AccessControlException, ObjectNotFoundException
     {
-        Optional<Crate> optionalCrate = crateRepository.findById( crateId );
+        Optional<Crate> optionalCrate = this.crateRepository.findById( crateId );
         if ( optionalCrate.isPresent() ) {
             Crate crate = optionalCrate.get();
-            try {
-                if ( crate.getOwner()
-                          .equals( ownerUser ) ) {
-                    crateRepository.delete( optionalCrate.get() );
+            CrateUser crateUser = crate.getCrateUsers()
+                                       .stream()
+                                       .filter( curCrateUser -> user.equals( curCrateUser.getUser() ) )
+                                       .findAny()
+                                       .orElse( null );
+            if ( crateUser != null ) {
+                if ( crateUser.getCanDestroy() ) {
+                    this.crateRepository.delete( crate );
                     return true;
                 } else {
-                    return false;
+                    throw new AccessControlException( "permission denied for users " + user.getId() + " to delete " +
+                                                              "crate " + crateId );
                 }
-            } catch (RuntimeException e) {
-                logger.debug( e.getMessage() );
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean addUser( User ownerUser, User user, Long crateId )
-    {
-        Optional<Crate> optionalCrate = crateRepository.findById( crateId );
-        if ( optionalCrate.isPresent() ) {
-            Crate crate = optionalCrate.get();
-            try {
-                if ( crate.getOwner()
-                          .equals( ownerUser ) ) {
-                    CrateUser crateUser = CrateUser.builder()
-                                                   .user( user )
-                                                   .crate( crate )
-                                                   .isOwner( false )
-                                                   .build();
-                    if ( crate.addCrateUser( crateUser ) ) {
-                        crateRepository.save( crate );
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } catch (RuntimeException e) {
-                logger.debug( e.getMessage() );
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean deleteUser( User ownerUser, User user, Long crateId )
-    {
-        Optional<Crate> optionalCrate = crateRepository.findById( crateId );
-        if ( optionalCrate.isPresent() ) {
-            Crate crate = optionalCrate.get();
-            try {
-                if ( crate.getOwner()
-                          .equals( ownerUser ) ) {
-                    CrateUser crateUser = CrateUser.builder()
-                                                   .user( user )
-                                                   .crate( crate )
-                                                   .isOwner( false )
-                                                   .build();
-                    if ( crate.removeCrateUser( crateUser ) ) {
-                        crateRepository.save( crate );
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } catch (RuntimeException e) {
-                logger.debug( e.getMessage() );
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean addWishList( User ownerUser, Long crateId, String label )
-    {
-        Optional<Crate> optionalCrate = crateRepository.findById( crateId );
-        if ( optionalCrate.isPresent() ) {
-            Crate crate = optionalCrate.get();
-            try {
-                if ( crate.getOwner()
-                          .equals( ownerUser ) ) {
-                    WishList list = WishList.builder()
-                                            .label( label )
-                                            .crate( crate )
-                                            .build();
-                    if ( crate.addCrateList( list ) ) {
-                        crateRepository.save( crate );
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } catch (RuntimeException e) {
-                logger.debug( e.getMessage() );
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean deleteWishList( User ownerUser, WishList wishList )
-    {
-        Crate crate = wishList.getCrate();
-        if ( crate.getOwner()
-                  .equals( ownerUser ) ) {
-            if ( crate.removeCrateWishList( wishList ) ) {
-                crateRepository.save( crate );
-                return true;
             } else {
-                return false;
+                throw new ObjectNotFoundException( "users", "crate" );
             }
         } else {
-            return false;
+            throw new ObjectNotFoundException( "id", "crate" );
+        }
+    }
+
+    public Boolean addUser( User currentUser, Long crateId, User user, Boolean[] grantOptions )
+    throws IllegalArgumentException, ObjectNotFoundException, AccessControlException
+    {
+        Optional<Crate> optionalCrate = this.crateRepository.findById( crateId );
+        if ( optionalCrate.isPresent() ) {
+            Crate crate = optionalCrate.get();
+            CrateUser crateUser = crate.getCrateUsers()
+                                       .stream()
+                                       .filter( curCrateUser -> user.equals( curCrateUser.getUser() ) )
+                                       .findAny()
+                                       .orElse( null );
+            if ( crateUser != null ) {
+                if ( crateUser.getCanGrant() ) {
+                    if(crate.addUser( user, grantOptions )) {
+                        this.crateRepository.save( crate );
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    throw new AccessControlException( "permission denied for users " + currentUser.getId() + " to " +
+                                                              "add users " + user.getId() + " to crate " + crateId );
+                }
+            } else {
+                throw new ObjectNotFoundException( "users", "crate" );
+            }
+        } else {
+            throw new ObjectNotFoundException( "id", "crate" );
+        }
+    }
+
+    public Boolean delUser( User currentUser, Long crateId, User user )
+    {
+        if ( !currentUser.equals( user ) ) {
+            Optional<Crate> optionalCrate = this.crateRepository.findById( crateId );
+            if ( optionalCrate.isPresent() ) {
+                Crate crate = optionalCrate.get();
+                CrateUser crateUser = crate.getCrateUsers()
+                                           .stream()
+                                           .filter( curCrateUser -> user.equals( curCrateUser.getUser() ) )
+                                           .findAny()
+                                           .orElse( null );
+                if ( crateUser != null ) {
+                    if ( crateUser.getCanGrant() ) {
+                        crate.deleteUser( user );
+                        this.crateRepository.save( crate );
+                        return true;
+                    } else {
+                        throw new AccessControlException( "permission denied for users " + currentUser.getId() + " to "
+                                                                  + "delete users " + user.getId() + " to crate " + crateId );
+                    }
+                } else {
+                    throw new ObjectNotFoundException( "users", "crate" );
+                }
+            } else {
+                throw new ObjectNotFoundException( "id", "crate" );
+            }
+        } else {
+            throw new AccessControlException( "users " + currentUser.getId() + " can't delete self" );
         }
     }
 }

@@ -2,12 +2,11 @@ package ru.gworkshop.slhub.common.model.entity;
 
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
-import ru.gworkshop.slhub.wishlist.model.entity.WishList;
+import org.hibernate.ObjectNotFoundException;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "hub_crate")
@@ -26,69 +25,39 @@ public class Crate
     private Long id;
 
     @Getter
-    @NotNull
+    @Column(nullable = false)
     private String label;
 
     @Getter
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "crate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CrateUser> crateUsers = new HashSet<>();
+    @OneToMany(mappedBy = "crate", cascade = CascadeType.ALL)
+    private List<CrateUser> crateUsers;
 
-    @Getter
-    @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "crate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WishList> crateWishLists = new HashSet<>();
-
-    public User getOwner()
+    //TODO: add check for preventing duplicates
+    public Boolean addUser( User user, Boolean[] grantOptions )
     {
-        if ( this.crateUsers == null ) {
-            throw new RuntimeException( "No users in Crate " + this.id );
-        } else {
-            for ( CrateUser crateUser : crateUsers ) {
-                if ( crateUser.getIsOwner() ) {
-                    return crateUser.getUser();
-                }
+        if(grantOptions.length == 3) {
+            CrateUser newCrateUser = CrateUser.builder()
+                                              .crate( this )
+                                              .user( user )
+                                              .canEdit( grantOptions[ 0 ] )
+                                              .canDestroy( grantOptions[ 1 ] )
+                                              .canGrant( grantOptions[ 2 ] )
+                                              .build();
+            if ( this.crateUsers == null ) {
+                this.crateUsers = new ArrayList<>();
             }
-
-            throw new RuntimeException( "No owner user in Crate " + this.id );
-        }
-    }
-
-    public boolean addCrateUser( CrateUser crateUser )
-    {
-        if ( this.crateUsers == null ) {
-            this.crateUsers = new HashSet<>();
-        }
-        this.crateUsers.add( crateUser );
-        return true;
-    }
-
-    public boolean removeCrateUser( CrateUser crateUser )
-    {
-        if ( this.crateUsers == null ) {
-            return false;
-        } else {
-            this.crateUsers.remove( crateUser );
+            this.crateUsers.add( newCrateUser );
             return true;
-        }
-    }
-
-    public boolean addCrateList( WishList wishList )
-    {
-        if ( this.crateWishLists == null ) {
-            this.crateWishLists = new HashSet<>();
-        }
-        this.crateWishLists.add( wishList );
-        return true;
-    }
-
-    public boolean removeCrateWishList( WishList wishList )
-    {
-        if ( this.crateUsers == null ) {
-            return false;
         } else {
-            this.crateWishLists.remove( wishList );
-            return true;
+            throw new IllegalArgumentException( "Incorrect grant options" );
+        }
+    }
+
+    public void deleteUser( User user ) throws ObjectNotFoundException
+    {
+        if(this.crateUsers != null) {
+            this.crateUsers.removeIf(curCrateUser-> curCrateUser.getUser() == user  );
         }
     }
 }

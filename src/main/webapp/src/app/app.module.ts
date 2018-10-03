@@ -4,11 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { LoginDialog } from './utils/components/login/login-dialog.component';
 
-import {
-	GoogleApiModule,
-	NgGapiClientConfig,
-	NG_GAPI_CONFIG,
-} from "ng-gapi";
+import { GoogleApiModule, NG_GAPI_CONFIG, NgGapiClientConfig, } from "ng-gapi";
 import { HttpClientModule } from "@angular/common/http";
 import { LoaderComponent } from './utils/components/loader/loader.component';
 import { MaterialExporterModule } from "./utils/modules/material-exporter/material-exporter.module";
@@ -20,6 +16,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppRouting } from "./app.routing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SidenavService } from "./home/services/side-nav-service.service";
+import { HTTPConnectorService } from "./utils/services/HTTPConnectorService";
 
 
 const gapiClientConfig: NgGapiClientConfig = {
@@ -52,8 +49,10 @@ const gapiClientConfig: NgGapiClientConfig = {
 		AuthService,
 		AuthGuardService,
 		UserProviderService,
+		HttpClientModule,
 		User,
-		SidenavService
+		SidenavService,
+		HTTPConnectorService
 	],
 	entryComponents: [AppComponent, LoginDialog],
 	bootstrap: [AppComponent]

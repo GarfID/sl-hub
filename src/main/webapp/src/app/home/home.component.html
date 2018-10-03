@@ -7,11 +7,11 @@
        [active]="activeLink == link"
         (click)="navTo(link)">
         {{link.label}}</a>
-    <div class="user-ear">
+    <div class="users-ear">
         <div>
             <button class="ear-content" mat-button (click)="this.openMenu()">
-                {{user.email}}
-                <img class="user-icon" [src]="user.userImage">
+                {{users.email}}
+                <img class="users-icon" [src]="users.userImage">
                 <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu"></div>
             </button>
         </div>

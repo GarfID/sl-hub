@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class WishListHandler
 {
-    private WishListRepository wishListRepository;
+    private final WishListRepository wishListRepository;
 
     @Autowired
     private WishListHandler( WishListRepository wishListRepository )

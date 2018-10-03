@@ -2,9 +2,9 @@ import { Injectable } from "@angular/core";
 import { GoogleAuthService } from "ng-gapi/lib/GoogleAuthService";
 import { GoogleApiService } from "ng-gapi";
 import { Observable } from "rxjs";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { UserProviderService } from "../data/user-provider.service";
+import { HTTPConnectorService } from "../HTTPConnectorService";
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,7 @@ export class AuthService {
                  private gapiService: GoogleApiService,
                  private userProvider: UserProviderService,
                  private router: Router,
-                 private http: HttpClient
+                 private httpConnector: HTTPConnectorService
     ) {
         this
             .gapiService
@@ -29,7 +29,7 @@ export class AuthService {
         return new Observable( observer => {
             this.googleAuthService.getAuth().subscribe( ( auth ) => {
                 auth.signIn().then( () => {
-                    this.getServerResponce( "/user/login", auth.currentUser.get().getAuthResponse().id_token ).subscribe( data => {
+                    this.httpConnector.getServerResponce( "/user/login", auth.currentUser.get().getAuthResponse().id_token ).subscribe( data => {
                         switch (data['status']) {
                             case 21:
                             case 25:
@@ -71,7 +71,7 @@ export class AuthService {
     public isLoggedIn(): Observable<boolean> {
         return new Observable<boolean>( observer => {
             this.googleAuthService.getAuth().subscribe( auth => {
-                this.getServerResponce( "/user/auth", auth.currentUser.get()
+                this.httpConnector.getServerResponce( "/user/auth", auth.currentUser.get()
                     .getAuthResponse().id_token ).subscribe( data => {
                     switch (data['status']) {
                         case 45:
@@ -93,7 +93,7 @@ export class AuthService {
                             break;
                         case 25:
                             if ( this.userProvider.getUser().state == null || this.userProvider.getUser().state != data['state'] ) {
-                                this.getServerResponce( '/user/sync', auth.currentUser.get()
+                                this.httpConnector.getServerResponce( '/user/sync', auth.currentUser.get()
                                     .getAuthResponse().id_token ).subscribe( data => {
                                     this.getUserPicture().subscribe( url => {
                                         data['user']['picture'] = url;
@@ -117,22 +117,6 @@ export class AuthService {
             this.googleAuthService.getAuth().subscribe( auth => {
                 observer.next( auth.currentUser.get().getBasicProfile()['Paa'] );
             } )
-        } );
-    }
-
-    public getServerResponce( url: String, token: string ) {
-        return new Observable( observer => {
-            let body = new FormData();
-            body.append( 'token', token);
-            const httpOptions = {
-                headers: new HttpHeaders( {
-                    'Origin': 'https://sl-hub.g-workshop.ru',
-                    'Accept': 'application/json'
-                } )
-            };
-            this.http.post( 'https://g-workshop.ru:8443/sl-hub-dev' + url, body, httpOptions ).subscribe( data => {
-                observer.next( data );
-            } );
         } );
     }
 }

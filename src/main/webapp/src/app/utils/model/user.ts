@@ -1,5 +1,7 @@
 import { Observable } from "rxjs";
 import { Injectable } from "@angular/core";
+import { Crate } from "./crate";
+import { HTTPConnectorService } from "../services/HTTPConnectorService";
 
 @Injectable()
 export class User {
@@ -8,10 +10,11 @@ export class User {
 	public email: String;
 	public googleId: String;
 	public userImage: String;
+	public crates: Array<Crate>;
 	public state: String;
 	public isAdmin: boolean;
 
-	constructor() {
+	constructor(private httpConnector: HTTPConnectorService) {
 	}
 
 	public setUser( data?: Object ): Observable<boolean> {
@@ -32,7 +35,10 @@ export class User {
 			this.id = null;
 			this.email = null;
 			this.googleId = null;
+			this.userImage = null;
 			this.state = null;
+			this.crates = null;
+			this.isAdmin = null;
 			observer.next( true );
 		} );
 	};

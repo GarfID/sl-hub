@@ -22,7 +22,7 @@ export class LoginDialog {
 			if(res) {
 				this.authService.signIn().subscribe(() => {
 					this.ngZone.run(() => {
-						this.authService.getRouter().navigate(['home']);
+						this.authService.getRouter().navigate(['/home']);
 					});
 				});
 			}

@@ -46,6 +46,9 @@
 /src/main/webapp/typings
 /src/main/webapp/package-lock.json
 
+### Spring ###
+/src/main/resources/
+
 # System Files
 .DS_Store
 Thumbs.db
