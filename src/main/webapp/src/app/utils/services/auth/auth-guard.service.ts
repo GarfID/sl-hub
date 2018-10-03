@@ -1,12 +1,9 @@
 import { Injectable, NgZone } from '@angular/core';
-import {
-	ActivatedRouteSnapshot,
-	CanActivate, CanLoad, Route,
-	RouterStateSnapshot
-} from "@angular/router";
+import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, RouterStateSnapshot } from "@angular/router";
 import { AuthService } from "./auth.service";
 import { Observable } from "rxjs";
 
+// @ts-ignore
 @Injectable()
 
 export class AuthGuardService implements CanActivate, CanLoad {
@@ -23,6 +20,10 @@ export class AuthGuardService implements CanActivate, CanLoad {
 		let url = `/${route.path}`;
 
 		return this.checkLogin(url);
+	}
+
+	resolve(){
+
 	}
 
 	checkLogin( url: String ): Observable<boolean> {

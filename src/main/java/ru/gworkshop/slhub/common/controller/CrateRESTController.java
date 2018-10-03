@@ -1,113 +1,104 @@
 package ru.gworkshop.slhub.common.controller;
 
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.gworkshop.slhub.common.service.Auth;
+import ru.gworkshop.slhub.common.model.entity.Crate;
+import ru.gworkshop.slhub.common.model.entity.User;
 import ru.gworkshop.slhub.common.service.CrateHandler;
 import ru.gworkshop.slhub.common.service.UserHandler;
-import ru.gworkshop.slhub.wishlist.service.WishListHandler;
 
-@RestController
-@CrossOrigin(origins = {"http://localhost:4200", "https://sl-hub.g-workshop.ru"})
+import java.security.AccessControlException;
+import java.util.List;
+
+@Controller
+@CrossOrigin(origins = { "http://localhost:4200", "https://sl-hub.g-workshop.ru" })
 @RequestMapping("/crate")
 public class CrateRESTController
 {
-    private final Auth auth;
     private final UserHandler userHandler;
     private final CrateHandler crateHandler;
-    private final WishListHandler wishListHandler;
 
     @Autowired
-    public CrateRESTController( Auth auth, UserHandler userHandler, CrateHandler crateHandler, WishListHandler wishListHandler )
+    public CrateRESTController( UserHandler userHandler, CrateHandler crateHandler )
     {
-        this.auth = auth;
-        this.crateHandler = crateHandler;
         this.userHandler = userHandler;
-        this.wishListHandler = wishListHandler;
+        this.crateHandler = crateHandler;
+    }
+
+    @RequestMapping(value = "/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<Crate> getCurrentUserCrates( @RequestParam(value = "token") String token )
+    {
+        try {
+            User user = userHandler.get( token );
+            return this.crateHandler.getByUser( user );
+        } catch (ObjectNotFoundException ignore) {
+            return null;
+        }
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
-    public boolean createCrate(
+    public Boolean createCrate(
             @RequestParam(value = "token", defaultValue = "") String token, @RequestParam(value = "label") String label
     )
     {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.createCrate( userHandler.get( token ), label );
-        } else {
-            return true;
+        try {
+            User user = userHandler.get( token );
+            return this.crateHandler.create( user, label );
+        } catch (ObjectNotFoundException ign) {
+            return false;
         }
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ResponseBody
-    public boolean deleteCrate(
+    public Boolean deleteCrate(
             @RequestParam(value = "token", defaultValue = "") String token,
             @RequestParam(value = "crate_id") Long crateId
     )
     {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.deleteCrate( userHandler.get( token ), crateId );
-        } else {
-            return true;
+        try {
+            User user = this.userHandler.get( token );
+            return this.crateHandler.delete( user, crateId );
+        } catch (ObjectNotFoundException | AccessControlException ign) {
+            return false;
         }
     }
 
-    @RequestMapping(value = "/add-user", method = RequestMethod.POST)
+    @RequestMapping(value = "/add-users", method = RequestMethod.POST)
     @ResponseBody
-    public boolean addUser(
+    public Boolean addUser(
+            @RequestParam(value = "token", defaultValue = "") String token,
+            @RequestParam(value = "crate_id") Long crateId,
+            @RequestParam(value = "user_id") Long userId,
+            @RequestParam(value = "grant_options") Boolean[] grantOptions
+    )
+    {
+        try {
+            User currentUser = this.userHandler.get( token );
+            User user = this.userHandler.get( userId );
+            return this.crateHandler.addUser(currentUser, crateId, user, grantOptions);
+        } catch (ObjectNotFoundException ing) {
+            return false;
+        }
+    }
+
+    @RequestMapping(value = "/del-users", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean deleteUser(
             @RequestParam(value = "token", defaultValue = "") String token,
             @RequestParam(value = "crate_id") Long crateId,
             @RequestParam(value = "user_id") Long userId
     )
     {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.addUser( userHandler.get( token ), userHandler.get( userId ), crateId );
-        } else {
-            return true;
-        }
-    }
-
-    @RequestMapping(value = "/del-user", method = RequestMethod.POST)
-    @ResponseBody
-    public boolean deleteUser(
-            @RequestParam(value = "token", defaultValue = "") String token,
-            @RequestParam(value = "crate_id") Long crateId,
-            @RequestParam(value = "user_id") Long userId
-    )
-    {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.deleteUser( userHandler.get( token ), userHandler.get( userId ), crateId );
-        } else {
-            return false;
-        }
-    }
-
-    @RequestMapping(value = "/add-wishlist", method = RequestMethod.POST)
-    @ResponseBody
-    public boolean deleteUser(
-            @RequestParam(value = "token", defaultValue = "") String token,
-            @RequestParam(value = "crate_id") Long crateId,
-            @RequestParam(value = "label") String label
-    )
-    {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.addWishList( userHandler.get( token ),crateId, label);
-        } else {
-            return false;
-        }
-    }
-
-    @RequestMapping(value = "/del-wishlist", method = RequestMethod.POST)
-    @ResponseBody
-    public boolean deleteUser(
-            @RequestParam(value = "token", defaultValue = "") String token,
-            @RequestParam(value = "wishlist_id") Long listId
-    )
-    {
-        if ( auth.checkAuth( token ).status == 25 ) {
-            return crateHandler.deleteWishList( userHandler.get( token ), wishListHandler.get( listId ) );
-        } else {
+        try {
+            User currentUser = this.userHandler.get( token );
+            User user = this.userHandler.get( userId );
+            return this.crateHandler.delUser(currentUser, crateId, user);
+        } catch (ObjectNotFoundException ing) {
             return false;
         }
     }

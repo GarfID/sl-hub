@@ -1,10 +1,10 @@
 package ru.gworkshop.slhub.common.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "hub_crate_user")
@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 public class CrateUser
 {
     @Id
+    @JsonIgnore
     @GeneratedValue
     @EqualsAndHashCode.Exclude
     private Long id;
@@ -27,14 +28,23 @@ public class CrateUser
     @Getter
     private User user;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crate_id")
-    @Getter
     private Crate crate;
 
-    @NotNull
-    @Column(name = "is_owner")
+    @Setter
     @Getter
-    @EqualsAndHashCode.Exclude
-    private Boolean isOwner;
+    @Column(nullable = false)
+    private Boolean canEdit;
+
+    @Setter
+    @Getter
+    @Column(nullable = false)
+    private Boolean canDestroy;
+
+    @Setter
+    @Getter
+    @Column(nullable = false)
+    private Boolean canGrant;
 }

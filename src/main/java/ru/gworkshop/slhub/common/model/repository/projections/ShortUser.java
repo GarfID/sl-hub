@@ -10,5 +10,6 @@ public interface ShortUser
 	@Value( "#{target.id}" )
 	Integer getId();
 
+	@Value( "#{target.state}" )
 	String getState();
 }

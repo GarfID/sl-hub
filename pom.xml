@@ -5,7 +5,7 @@
 
     <groupId>ru.g-workshop</groupId>
     <artifactId>sl-hub</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>dev</version>
     <!--<packaging>jar</packaging>-->
     <packaging>war</packaging>
 
@@ -16,7 +16,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.0.3.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
     <properties>
@@ -62,12 +62,6 @@
             <artifactId>spring-data-rest-webmvc</artifactId>
             <version>3.0.9.RELEASE</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <version>2.0.3.RELEASE</version>
-            <scope>provided</scope>
-        </dependency>-->
 
         <dependency>
             <groupId>org.bouncycastle</groupId>

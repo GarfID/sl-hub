@@ -3,44 +3,53 @@ package ru.gworkshop.slhub.common.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.gworkshop.slhub.common.model.rest.responce.AuthResponce;
-import ru.gworkshop.slhub.common.model.rest.responce.LoginResponce;
-import ru.gworkshop.slhub.common.service.Auth;
+import ru.gworkshop.slhub.common.model.rest.responce.AuthResponse;
+import ru.gworkshop.slhub.common.model.rest.responce.LoginResponse;
+import ru.gworkshop.slhub.common.model.rest.responce.UserResponse;
+import ru.gworkshop.slhub.common.service.UserHandler;
 
 
-@RestController
+@Controller
 @CrossOrigin(origins = {"http://localhost:4200", "https://sl-hub.g-workshop.ru/"})
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserRESTController
 {
-	private final Auth auth;
-	private Logger logger = LoggerFactory.getLogger( UserRESTController.class );
+	private final UserHandler userHandler;
+	private final Logger logger = LoggerFactory.getLogger( UserRESTController.class );
 
 	@Autowired
-	public UserRESTController( Auth auth ){this.auth = auth;}
+	public UserRESTController( UserHandler userHandler ){this.userHandler = userHandler;}
 
-	@RequestMapping(value = "/auth", method = RequestMethod.POST)
+	@RequestMapping(value = "/find", method = RequestMethod.POST)
+    @ResponseBody
+    public UserResponse findByEmail( @RequestParam(value = "token", defaultValue = "") String token, @RequestParam(value = "email", defaultValue = "") String email) {
+        logger.debug( "checkAuth received token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
+        return userHandler.findByEmail( email);
+    }
+
+	@RequestMapping(value = "/userHandler", method = RequestMethod.POST)
 	@ResponseBody
-	public AuthResponce checkAuth( @RequestParam(value = "token", defaultValue = "") String token )
+	public AuthResponse checkAuth( @RequestParam(value = "token", defaultValue = "") String token )
 	{
-		logger.debug( "checkAuth recived token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
-		return auth.checkAuth( token );
+		logger.debug( "checkAuth received token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
+		return userHandler.checkAuth( token );
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
-	public LoginResponce login( @RequestParam(value = "token", defaultValue = "") String token )
+	public LoginResponse login( @RequestParam(value = "token", defaultValue = "") String token )
 	{
-		logger.debug( "login recived token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
-		return auth.login( token );
+		logger.debug( "login received token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
+		return userHandler.login( token );
 	}
 
 	@RequestMapping(value = "/sync", method = RequestMethod.POST)
 	@ResponseBody
-	public LoginResponce sync( @RequestParam(value = "token", defaultValue = "") String token )
+	public LoginResponse sync( @RequestParam(value = "token", defaultValue = "") String token )
 	{
-		logger.debug( "sync recived token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
-		return auth.sync(token);
+		logger.debug( "sync received token " + token + " (is_null = " + String.valueOf( token == null ) + ")" );
+		return userHandler.sync( token);
 	}
 }
