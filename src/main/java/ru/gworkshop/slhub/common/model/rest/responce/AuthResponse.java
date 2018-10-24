@@ -10,4 +10,9 @@ public class AuthResponse
 	public AuthResponse( Integer status) {
 		this.status = status;
 	}
+
+	public Integer getStatus()
+	{
+		return status;
+	}
 }
