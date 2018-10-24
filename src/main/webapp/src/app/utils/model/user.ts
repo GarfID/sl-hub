@@ -30,6 +30,13 @@ export class User {
 		} );
 	}
 
+	public loadUserCrates(): Observable<boolean> {
+		return new Observable( observer => {
+		    this.httpConnector.getServerResponce('/crate/create', );
+			observer.next(true);
+		})
+	}
+
 	flush(): Observable<boolean> {
 		return new Observable( observer => {
 			this.id = null;

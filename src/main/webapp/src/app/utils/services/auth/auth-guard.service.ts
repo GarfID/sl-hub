@@ -22,6 +22,10 @@ export class AuthGuardService implements CanActivate, CanLoad {
 		return this.checkLogin(url);
 	}
 
+	resolve(){
+
+	}
+
 	checkLogin( url: String ): Observable<boolean> {
 		return new Observable<boolean>( observer => {
 			this.authService.isLoggedIn().subscribe( res => {
