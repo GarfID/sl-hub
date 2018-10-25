@@ -1,5 +1,6 @@
 package ru.gworkshop.slhub.common.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.ObjectNotFoundException;
@@ -30,7 +31,8 @@ public class Crate
 
     @Getter
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "crate", cascade = CascadeType.ALL)
+    @JsonBackReference
+    @OneToMany(mappedBy = "crate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<CrateUser> crateUsers;
 
     //TODO: add check for preventing duplicates
@@ -57,7 +59,7 @@ public class Crate
     public void deleteUser( User user ) throws ObjectNotFoundException
     {
         if(this.crateUsers != null) {
-            this.crateUsers.removeIf(curCrateUser-> curCrateUser.getUser() == user  );
+            this.crateUsers.removeIf(curCrateUser-> curCrateUser.getUser().equals( user )   );
         }
     }
 }

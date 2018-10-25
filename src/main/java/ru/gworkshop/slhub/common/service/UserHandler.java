@@ -50,7 +50,9 @@ public class UserHandler
     public User get( Long id ) throws ObjectNotFoundException
     {
         Optional<User> optionalUser = userRepository.findById( id );
-        if ( optionalUser.isPresent() ) { return optionalUser.get(); } else {
+        if ( optionalUser.isPresent() ) {
+            return optionalUser.get();
+        } else {
             throw new ObjectNotFoundException( "id", User.class.getName() );
         }
     }

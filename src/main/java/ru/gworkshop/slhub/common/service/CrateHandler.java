@@ -86,7 +86,7 @@ public class CrateHandler
             Crate crate = optionalCrate.get();
             CrateUser crateUser = crate.getCrateUsers()
                                        .stream()
-                                       .filter( curCrateUser -> user.equals( curCrateUser.getUser() ) )
+                                       .filter( curCrateUser -> currentUser.equals( curCrateUser.getUser() ) )
                                        .findAny()
                                        .orElse( null );
             if ( crateUser != null ) {
@@ -117,7 +117,7 @@ public class CrateHandler
                 Crate crate = optionalCrate.get();
                 CrateUser crateUser = crate.getCrateUsers()
                                            .stream()
-                                           .filter( curCrateUser -> user.equals( curCrateUser.getUser() ) )
+                                           .filter( curCrateUser -> currentUser.equals( curCrateUser.getUser() ) )
                                            .findAny()
                                            .orElse( null );
                 if ( crateUser != null ) {

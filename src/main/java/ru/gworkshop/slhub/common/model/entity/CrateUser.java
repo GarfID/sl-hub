@@ -1,6 +1,7 @@
 package ru.gworkshop.slhub.common.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
 
@@ -28,7 +29,7 @@ public class CrateUser
     @Getter
     private User user;
 
-    @JsonIgnore
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crate_id")
     private Crate crate;
