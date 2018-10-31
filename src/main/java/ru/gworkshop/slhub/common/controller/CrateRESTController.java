@@ -68,25 +68,25 @@ public class CrateRESTController
         }
     }
 
-    @RequestMapping(value = "/add-users", method = RequestMethod.POST)
+    @RequestMapping(value = "/add-user", method = RequestMethod.POST)
     @ResponseBody
     public Boolean addUser(
             @RequestParam(value = "token", defaultValue = "") String token,
             @RequestParam(value = "crate_id") Long crateId,
             @RequestParam(value = "user_id") Long userId,
-            @RequestParam(value = "grant_options") Boolean[] grantOptions
+            @RequestParam(value = "privileges") Boolean[] privileges
     )
     {
         try {
             User currentUser = this.userHandler.get( token );
             User user = this.userHandler.get( userId );
-            return this.crateHandler.addUser(currentUser, crateId, user, grantOptions);
-        } catch (ObjectNotFoundException ing) {
+            return this.crateHandler.addUser(currentUser, crateId, user, privileges);
+        } catch (ObjectNotFoundException | AccessControlException ign) {
             return false;
         }
     }
 
-    @RequestMapping(value = "/del-users", method = RequestMethod.POST)
+    @RequestMapping(value = "/del-user", method = RequestMethod.POST)
     @ResponseBody
     public boolean deleteUser(
             @RequestParam(value = "token", defaultValue = "") String token,
@@ -98,7 +98,25 @@ public class CrateRESTController
             User currentUser = this.userHandler.get( token );
             User user = this.userHandler.get( userId );
             return this.crateHandler.delUser(currentUser, crateId, user);
-        } catch (ObjectNotFoundException ing) {
+        } catch (ObjectNotFoundException | AccessControlException ign) {
+            return false;
+        }
+    }
+
+    @RequestMapping(value = "/upd-user", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean updateUserCratePrivileges(
+            @RequestParam(value = "token", defaultValue = "") String token,
+            @RequestParam(value = "crate_id") Long crateId,
+            @RequestParam(value = "user_id") Long userId,
+            @RequestParam(value = "privileges") Boolean[] privileges
+    )
+    {
+        try {
+            User currentUser = this.userHandler.get( token );
+            User user = this.userHandler.get( userId );
+            return this.crateHandler.updateUserCratePrivileges(currentUser, crateId, user, privileges);
+        } catch (ObjectNotFoundException | AccessControlException ign) {
             return false;
         }
     }

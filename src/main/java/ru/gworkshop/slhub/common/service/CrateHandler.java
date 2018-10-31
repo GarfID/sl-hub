@@ -78,7 +78,7 @@ public class CrateHandler
         }
     }
 
-    public Boolean addUser( User currentUser, Long crateId, User user, Boolean[] grantOptions )
+    public Boolean addUser( User currentUser, Long crateId, User user, Boolean[] privileges )
     throws IllegalArgumentException, ObjectNotFoundException, AccessControlException
     {
         Optional<Crate> optionalCrate = this.crateRepository.findById( crateId );
@@ -91,7 +91,7 @@ public class CrateHandler
                                        .orElse( null );
             if ( crateUser != null ) {
                 if ( crateUser.getCanGrant() ) {
-                    if(crate.addUser( user, grantOptions )) {
+                    if(crate.addUser( user, privileges )) {
                         this.crateRepository.save( crate );
                         return true;
                     } else {
@@ -137,6 +137,38 @@ public class CrateHandler
             }
         } else {
             throw new AccessControlException( "users " + currentUser.getId() + " can't delete self" );
+        }
+    }
+
+    public boolean updateUserCratePrivileges( User currentUser, Long crateId, User user, Boolean[] privileges )
+    {
+        if ( !currentUser.equals( user ) ) {
+            Optional<Crate> optionalCrate = this.crateRepository.findById( crateId );
+            if ( optionalCrate.isPresent() ) {
+                Crate crate = optionalCrate.get();
+                CrateUser crateUser = crate.getCrateUsers()
+                                           .stream()
+                                           .filter( curCrateUser -> currentUser.equals( curCrateUser.getUser() ) )
+                                           .findAny()
+                                           .orElse( null );
+                if ( crateUser != null ) {
+                    if ( crateUser.getCanGrant() ) {
+                        crate.updateUserPrivileges( crateUser, privileges );
+                        this.crateRepository.save( crate );
+                        return true;
+                    } else {
+                        throw new AccessControlException(
+                                "permission denied for users " + currentUser.getId() + " to "
+                                + "privilege users " + user.getId() + " to crate " + crateId);
+                    }
+                } else {
+                    throw new ObjectNotFoundException( "users", "crate" );
+                }
+            } else {
+                throw new ObjectNotFoundException( "id", "crate" );
+            }
+        } else {
+            throw new AccessControlException( "users " + currentUser.getId() + " can't change his own privileges self" );
         }
     }
 }

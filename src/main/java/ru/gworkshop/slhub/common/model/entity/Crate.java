@@ -36,15 +36,15 @@ public class Crate
     private List<CrateUser> crateUsers;
 
     //TODO: add check for preventing duplicates
-    public Boolean addUser( User user, Boolean[] grantOptions )
+    public Boolean addUser( User user, Boolean[] privileges )
     {
-        if(grantOptions.length == 3) {
+        if(privileges.length == 3) {
             CrateUser newCrateUser = CrateUser.builder()
                                               .crate( this )
                                               .user( user )
-                                              .canEdit( grantOptions[ 0 ] )
-                                              .canDestroy( grantOptions[ 1 ] )
-                                              .canGrant( grantOptions[ 2 ] )
+                                              .canEdit( privileges[ 0 ] )
+                                              .canDestroy( privileges[ 1 ] )
+                                              .canGrant( privileges[ 2 ] )
                                               .build();
             if ( this.crateUsers == null ) {
                 this.crateUsers = new ArrayList<>();
@@ -59,7 +59,19 @@ public class Crate
     public void deleteUser( User user ) throws ObjectNotFoundException
     {
         if(this.crateUsers != null) {
-            this.crateUsers.removeIf(curCrateUser-> curCrateUser.getUser().equals( user )   );
+            this.crateUsers.removeIf(curCrateUser-> curCrateUser.getUser().equals( user ) );
         }
+    }
+
+    public void updateUserPrivileges( CrateUser user, Boolean[] privileges )
+    {
+        int index = this.crateUsers.indexOf( user );
+        CrateUser targetCrateUser = this.crateUsers.get( index );
+
+        targetCrateUser.setCanEdit( privileges[0] );
+        targetCrateUser.setCanDestroy( privileges[1] );
+        targetCrateUser.setCanGrant( privileges[2] );
+
+        this.crateUsers.set( index, targetCrateUser );
     }
 }

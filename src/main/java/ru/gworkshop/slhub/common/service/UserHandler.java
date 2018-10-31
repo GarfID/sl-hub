@@ -8,45 +8,62 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.PersistentObjectException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import ru.gworkshop.slhub.common.model.entity.GoogleUserInfo;
 import ru.gworkshop.slhub.common.model.entity.User;
 import ru.gworkshop.slhub.common.model.repository.UserRepository;
-import ru.gworkshop.slhub.common.model.responce.AuthResponse;
-import ru.gworkshop.slhub.common.model.responce.LoginResponse;
-import ru.gworkshop.slhub.common.model.responce.UserResponse;
+import ru.gworkshop.slhub.common.model.responce.REST.UniversalResponse;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 
-@Service
+/**
+ * @author Aleksey Chebotarev <garfid.n.rena@gmail.com>
+ * @version 0.1-TEST
+ * @since 0.1-TEST
+ */
+@Service("UserHandler")
 public class UserHandler
 {
+    private Environment environment;
 
-    /**
-     * Статусы:
-     * 21 - успешная регистрация нового пользователя
-     * 25 - успешная авторизация
-     * 43 - пользователь уже зарегистрирован
-     * 44 - пользователь не найден
-     * 45 - токен не верифицирован
-     * 500 - непредвиденная ошибка
-     */
-
-    private static final Logger logger = LoggerFactory.getLogger( UserHandler.class );
     private final UserRepository userRepository;
 
+    private static final String CLIENT_ID = "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com";
+    private final GoogleIdTokenVerifier VERIFIER;
+
+    /**
+     * <p>Initializes Google API verifier and hook user entities repository</p>
+     *
+     * @param userRepository autowired user entities repository
+     */
     @Autowired
-    public UserHandler( UserRepository userRepository )
+    public UserHandler( UserRepository userRepository, Environment environment )
     {
         this.userRepository = userRepository;
+        this.environment = environment;
+
+        HttpTransport transport = new NetHttpTransport();
+        JsonFactory jsonFactory = new JacksonFactory();
+        VERIFIER = new GoogleIdTokenVerifier.Builder( transport, jsonFactory ).setAudience( Collections.singletonList(
+                UserHandler.CLIENT_ID ) )
+                                                                              .build();
     }
 
+    /**
+     * <p>Find user by ID</p>
+     *
+     * @param id ID of a user to be found
+     *
+     * @return found User object
+     *
+     * @throws ObjectNotFoundException thrown when user with such ID do not isRegistered
+     */
     public User get( Long id ) throws ObjectNotFoundException
     {
         Optional<User> optionalUser = userRepository.findById( id );
@@ -57,44 +74,104 @@ public class UserHandler
         }
     }
 
-    public User get( String token ) throws ObjectNotFoundException
+    /**
+     * <p>Find user by Google Auth Token via parsing Google ID</p>
+     * <p>Untestable<p/>
+     *
+     * @param token Google Auth Token of a user to be found
+     *
+     * @return found User object
+     *
+     * @throws ObjectNotFoundException  thrown when user with such ID do not isRegistered
+     * @throws IllegalArgumentException thrown when Google Auth Token is invalid
+     */
+    public User get( String token ) throws ObjectNotFoundException, IllegalArgumentException
     {
-        return get( UserHandler.getIdToken( token )
-                               .getPayload() );
-    }
+        if ( checkToken( token ) ) {
+            GoogleUserInfo googleUserInfo = getIdToken( token );
 
-    private User get( GoogleIdToken.Payload payload )
-    {
-        Optional<User> optionalUser = userRepository.findByGoogleId( payload.getSubject() );
-        if ( optionalUser.isPresent() ) {
-            return optionalUser.get();
+            Optional<User> optionalUser = userRepository.findByGoogleId( googleUserInfo.googleId );
+            if ( optionalUser.isPresent() ) {
+                return optionalUser.get();
+            } else {
+                throw new ObjectNotFoundException( "googleId", User.class.getName() );
+            }
         } else {
-            throw new ObjectNotFoundException( "googleId", User.class.getName() );
+            throw new IllegalArgumentException( "Invalid Google Auth Token" );
         }
     }
 
-    private boolean exists( String token )
+    /**
+     * <p>Find user with specified email and </p>
+     *
+     * @param email e-mail of user to be found
+     *
+     * @return found user or null if user with such email do not exist
+     *
+     * @throws ObjectNotFoundException thrown if user with such email is not registered
+     */
+    public User getByEmail( String email ) throws ObjectNotFoundException
     {
-        return exists( UserHandler.getIdToken( token )
-                                  .getPayload() );
+        Optional<User> optionalUser = this.userRepository.findByEmail( email );
+        if ( optionalUser.isPresent() ) {
+            return optionalUser.get();
+        } else {
+            throw new ObjectNotFoundException( "id", User.class.getName() );
+        }
     }
 
-    private boolean exists( GoogleIdToken.Payload payload )
+    /**
+     * <p>Check if a user with such ID registered</p>
+     *
+     * @param id id of a User to be checked
+     *
+     * @return if a user with such ID is registered
+     */
+    public boolean isRegistered( Long id )
     {
-        return userRepository.existsByGoogleId( payload.getSubject() );
+        return userRepository.existsById( id );
     }
 
-    private User register( String token ) throws PersistentObjectException
+    /**
+     * <p>Check if a user with Google Auth Token registered via parsing Google ID</p>
+     *
+     * @param token Google Auth Token of a user to be checked
+     *
+     * @return if a user represented with such token registered
+     *
+     * @throws IllegalArgumentException thrown when Google Auth Token is invalid
+     */
+    public boolean isRegistered( String token ) throws IllegalArgumentException
     {
-        GoogleIdToken.Payload payload = Objects.requireNonNull( UserHandler.getIdToken( token ) )
-                                               .getPayload();
-        if ( !exists( payload ) ) {
+        if ( checkToken( token ) ) {
+            GoogleUserInfo googleUserInfo = getIdToken( token );
+
+            return userRepository.existsByGoogleId( googleUserInfo.googleId );
+        } else {
+            throw new IllegalArgumentException( "Invalid Google Auth Token" );
+        }
+    }
+
+    /**
+     * <p>Register new user</p>
+     *
+     * @param token Google Auth Token to define new user's info
+     *
+     * @return new user object
+     *
+     * @throws PersistentObjectException thrown when such user is already registered
+     * @throws IllegalArgumentException  thrown when Google Auth Token is invalid
+     */
+    public User register( String token, Boolean isAdmin ) throws PersistentObjectException, IllegalArgumentException
+    {
+        if ( !isRegistered( token ) ) {
+
+            GoogleUserInfo googleUserInfo = getIdToken( token );
 
             User newUser = User.builder()
-                               .email( payload.getEmail() )
-                               .googleId( payload.getSubject() )
-                               .isAdmin( payload.getEmail()
-                                                .equals( "garfid.n.rena@gmail.com" ) )
+                               .email( googleUserInfo.email )
+                               .googleId( googleUserInfo.googleId )
+                               .isAdmin( isAdmin )
                                .build();
             userRepository.save( newUser );
             return newUser;
@@ -103,91 +180,174 @@ public class UserHandler
         }
     }
 
-    private static GoogleIdToken getIdToken( String token )
+    /**
+     * <p>Get user details from Google Auth Token</p>
+     * <p>Untestable</p>
+     *
+     * @param token Google Auth Token to be processed
+     *
+     * @return Google ID Token with user details in payload
+     *
+     * @throws IllegalArgumentException thrown when token is invalid
+     */
+    public GoogleUserInfo getIdToken( String token ) throws IllegalArgumentException
     {
-        logger.debug( "Entering getIdToken with arg " + token );
-        HttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = new JacksonFactory();
-        String CLIENT_ID = "793835333693-3vm2oobhs289tfhrod3uhintopibb0gg.apps.googleusercontent.com";
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder( transport, jsonFactory ).setAudience(
-                Collections.singletonList( CLIENT_ID ) )
-                                                                                                    .build();
-        try {
-            GoogleIdToken idToken = verifier.verify( token );
-            if ( idToken == null ) {
-                logger.debug( "Token is not verified" );
-                throw new NullPointerException( "Verifier returned NULL" );
-            } else {
-                logger.debug( "idToken is " + token );
-                return idToken;
+        /*Mocking for testing purposes*/
+        if ( Arrays.asList( environment.getActiveProfiles() )
+                    .contains( "test" ) ) {
+            return new GoogleUserInfo( "test" + token + "@email.com", token );
+        } else {
+            try {
+                GoogleIdToken idToken = VERIFIER.verify( token );
+                if ( idToken == null ) {
+                    throw new NullPointerException( "Verifier returned NULL" );
+                } else {
+                    return new GoogleUserInfo( idToken.getPayload() );
+                }
+            } catch (NullPointerException | IllegalArgumentException | GeneralSecurityException | IOException e) {
+                throw new IllegalArgumentException( "Invalid token" );
             }
-        } catch (NullPointerException | IllegalArgumentException | GeneralSecurityException | IOException e) {
-            logger.debug( "Token invalid while validating" );
-            throw new IllegalArgumentException( "Invalid token" );
         }
     }
 
+    /**
+     * <p>Check if Google Auth Token is valid</p>
+     * <p>Untestable</p>
+     *
+     * @param token Google Auth Token to be verified
+     *
+     * @return true if a token is valid, or false if token is invalid
+     */
     private boolean checkToken( String token )
     {
-        logger.debug( "Entered checkToken with arg " + token );
-        if ( token == null || token.length() < 64 ) {
-            logger.debug( "Token is too short" );
+        int minTokenSize;
+
+        if ( Arrays.asList( environment.getActiveProfiles() )
+                    .contains( "test" ) ) {
+            minTokenSize = 1;
+        } else {
+            minTokenSize = 64;
+        }
+
+        if ( token == null || token.length() < minTokenSize ) {
             return false;
         } else {
             try {
-                getIdToken( token );
-            } catch (IllegalArgumentException e) {
+                /*Mocking for testing purposes*/
+                if ( !Arrays.asList( environment.getActiveProfiles() )
+                           .contains( "test" ) ) {
+                    VERIFIER.verify( token );
+                }
+            } catch (NullPointerException | IllegalArgumentException | GeneralSecurityException | IOException e) {
                 return false;
             }
             return true;
         }
     }
 
-    public AuthResponse checkAuth( String token )
+    /**
+     * <p>Form REST responce for {@link #isRegistered(String)}</p>
+     * <p>statuses:</p>
+     * <p>25 - user is registered</p>
+     * <p>44 - user is not registered</p>
+     * <p>45 - invalid token</p>
+     *
+     * @param token Google Auth Token of user to be checked
+     *
+     * @return Universal Response object with only status field set
+     */
+    public UniversalResponse<User> checkAuth( String token )
     {
-        logger.debug( "Entered checkAuth with arg " + token );
-        if ( checkToken( token ) ) {
-            if ( exists( token ) ) {
-                return new AuthResponse( 25 );
+        try {
+            if ( isRegistered( token ) ) {
+                return new UniversalResponse<>( 25 );
             } else {
-                return new AuthResponse( 44 );
+                return new UniversalResponse<>( 44 );
             }
-        } else {
-            logger.debug( "Received token is invalid" );
-            return new AuthResponse( 45 );
+        } catch (IllegalArgumentException e) {
+            return new UniversalResponse<>( 45 );
         }
     }
 
-    public LoginResponse login( String token )
+    /**
+     * <p>Form REST response for {@link #register(String, Boolean)}}</p>
+     * <p>statuses:</p>
+     * <p>21 - new user is registered in system</p>
+     * <p>25 - user already registered in system</p>
+     * <p>45 - invalid token</p>
+     *
+     * @param token Google Auth Token of user to be checked
+     *
+     * @return Universal Response object with only status field set
+     */
+    public UniversalResponse<User> login( String token )
     {
-        if ( checkToken( token ) ) {
-            if ( this.exists( token ) ) {
-                return new LoginResponse( 25, this.get( token ) );
-            } else {
-                return new LoginResponse( 21, this.register( token ) );
-            }
-        } else {
-            return new LoginResponse( 45 );
+        try {
+            return new UniversalResponse<>( 25, null, get( token ) );
+        } catch (ObjectNotFoundException e) {
+            return new UniversalResponse<>( 21, null, this.register( token, false ) );
+        } catch (IllegalArgumentException e) {
+            return new UniversalResponse<>( 45 );
         }
     }
 
-    public LoginResponse sync( String token )
+    /**
+     * <p>Form REST response for {@link #get(Long)}<p/>
+     * <p>statuses:</p>
+     * <p>31 - user found</p>
+     * <p>34 - user not found</p>
+     * <p>44 - requesting user is not registered</p>
+     * <p>45 - invalid token</p>
+     *
+     * @param token Google Auth Token of a requesting user
+     * @param id    id of a user to be found
+     *
+     * @return UniversalResponse with status and payload fields set
+     */
+    public UniversalResponse<User> findUser( String token, Long id )
     {
-        if ( checkToken( token ) ) {
-            if ( this.exists( token ) ) {
-                return new LoginResponse( 25, this.get( token ) );
+        try {
+            if ( isRegistered( token ) ) {
+                try {
+                    return new UniversalResponse<>( 31, null, get( id ) );
+                } catch (ObjectNotFoundException e) {
+                    return new UniversalResponse<>( 34 );
+                }
             } else {
-                return new LoginResponse( 44, null );
+                return new UniversalResponse<>( 44 );
             }
-        } else {
-            return new LoginResponse( 45, null );
+        } catch (IllegalArgumentException e) {
+            return new UniversalResponse<>( 45 );
         }
     }
 
-    public UserResponse findByEmail( String email )
+    /**
+     * <p>Form REST response for {@link #getByEmail(String)}}<p/>
+     * <p>statuses:</p>
+     * <p>31 - user found</p>
+     * <p>34 - user not found</p>
+     * <p>44 - requesting user is not registered</p>
+     * <p>45 - invalid token</p>
+     *
+     * @param token Google Auth Token of a requesting user
+     * @param email email of a user to be found
+     *
+     * @return UniversalResponse with status and payload fields set
+     */
+    public UniversalResponse<User> findUser( String token, String email )
     {
-        Optional<User> optionalUser = this.userRepository.findByEmail( email );
-        return optionalUser.map( user -> new UserResponse( 24, user ) )
-                           .orElseGet( () -> new UserResponse( 44 ) );
+        try {
+            if ( isRegistered( token ) ) {
+                try {
+                    return new UniversalResponse<>( 31, null, getByEmail( email ) );
+                } catch (ObjectNotFoundException e) {
+                    return new UniversalResponse<>( 34 );
+                }
+            } else {
+                return new UniversalResponse<>( 44 );
+            }
+        } catch (IllegalArgumentException e) {
+            return new UniversalResponse<>( 45 );
+        }
     }
 }
