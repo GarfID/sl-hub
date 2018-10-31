@@ -20,7 +20,8 @@ public class User
 {
     @Id
     @Getter
-    @GeneratedValue
+    @EqualsAndHashCode.Exclude
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Email
